@@ -1,23 +1,35 @@
 package com.example.acquaint.daggerdemo.app;
 
 import android.app.Application;
+import android.content.Context;
 
-import com.example.acquaint.daggerdemo.component.DaggerMyComponent;
-import com.example.acquaint.daggerdemo.component.MyComponent;
-import com.example.acquaint.daggerdemo.modules.MyModule;
+import com.example.acquaint.daggerdemo.component.ApplicationComponent;
+import com.example.acquaint.daggerdemo.component.DaggerApplicationComponent;
+import com.example.acquaint.daggerdemo.modules.ApplicationModule;
+
+import javax.inject.Inject;
 
 public class ApplicationClass extends Application{
 
-    private MyComponent mMyComponent;
+    @Inject
+    DataManager dataManager;
+    private ApplicationComponent applicationComponent;
 
-    public MyComponent getmMyComponent() {
-        return mMyComponent;
+    public static ApplicationClass get(Context context) {
+        return (ApplicationClass) context.getApplicationContext();
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        mMyComponent= DaggerMyComponent.builder()
-                .myModule(new MyModule()).build();
+        applicationComponent = DaggerApplicationComponent
+                .builder()
+                .applicationModule(new ApplicationModule(this))
+                .build();
+        applicationComponent.inject(this);
+    }
+
+    public ApplicationComponent getComponent(){
+        return applicationComponent;
     }
 }
